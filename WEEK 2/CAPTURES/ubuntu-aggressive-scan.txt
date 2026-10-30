@@ -1,0 +1,32 @@
+# Nmap 7.991 scan initiated Thu Oct 29 02:48:13 2026 as: /usr/lib/nmap/nmap -A -oN /home/kali/ubuntu-aggressive-scan.txt -oX /home/kali/ubuntu-aggressive-scan.xml 192.168.56.103
+Nmap scan report for 192.168.56.103
+Host is up (0.0019s latency).
+Not shown: 999 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Apache httpd 2.4.66 ((Ubuntu))
+|_http-title: Apache2 Ubuntu Default Page: It works
+|_http-server-header: Apache/2.4.66 (Ubuntu)
+MAC Address: 08:00:27:BC:21:B5 (Oracle VirtualBox virtual NIC)
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.991%E=4%D=10/29%OT=80%CT=1%CU=41338%PV=Y%DS=1%DC=D%G=Y%M=080027
+OS:%TM=6AE2EC40%P=x86_64-pc-linux-gnu)SEQ(SP=102%GCD=1%ISR=103%TI=Z%CI=Z%TS
+OS:=22)SEQ(SP=102%GCD=2%ISR=10C%TI=Z%CI=Z%TS=21)SEQ(SP=105%GCD=1%ISR=109%TI
+OS:=Z%CI=Z%TS=22)SEQ(SP=106%GCD=1%ISR=105%TI=Z%CI=Z%II=I%TS=20)SEQ(SP=106%G
+OS:CD=1%ISR=10B%TI=Z%CI=Z%TS=21)OPS(O1=M5B4ST11NWA%O2=M5B4ST11NWA%O3=M5B4NN
+OS:T11NWA%O4=M5B4ST11NWA%O5=M5B4ST11NWA%O6=M5B4ST11)WIN(W1=FE88%W2=FE88%W3=
+OS:FE88%W4=FE88%W5=FE88%W6=FE88)ECN(R=Y%DF=Y%T=40%W=FAF0%O=M5B4NNSNWA%CC=Y%
+OS:Q=)T1(R=Y%DF=Y%T=40%S=O%A=S+%F=AS%RD=0%Q=)T2(R=N)T3(R=N)T4(R=Y%DF=Y%T=40
+OS:%W=0%S=A%A=Z%F=R%O=%RD=B1C2A1A3%Q=)T5(R=Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=
+OS:%RD=B1C2A1A3%Q=)T6(R=Y%DF=Y%T=40%W=0%S=A%A=Z%F=R%O=%RD=B1C2A1A3%Q=)T7(R=
+OS:Y%DF=Y%T=40%W=0%S=Z%A=S+%F=AR%O=%RD=B1C2A1A3%Q=)U1(R=Y%DF=N%T=40%IPL=164
+OS:%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=N)IE(R=Y%DFI=N%T=40%CD=S)
+
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   1.95 ms 192.168.56.103
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Oct 29 02:48:32 2026 -- 1 IP address (1 host up) scanned in 19.09 seconds
