@@ -1,0 +1,67 @@
+WEEK 4 - SIEM IN PRACTICE
+08. SOC TIERS AND TRIAGE
+
+1. What is a SOC?
+A Security Operations Center (SOC) is a team or function that monitors an organization's systems, investigates security alerts, coordinates response, and helps improve security detection.
+
+2. SOC tiers
+
+Tier | Main responsibility | Typical work
+L1 - Security Analyst | Initial monitoring and triage | Monitor alert queues, validate basic evidence, remove clearly benign noise, collect details, document findings, and escalate suspicious cases
+L2 - Security Analyst / Incident Responder | Deeper investigation and containment coordination | Correlate events, investigate endpoints and accounts, determine scope and impact, recommend or perform approved containment actions
+L3 - Senior Analyst / Threat Hunter / Detection Engineer | Advanced analysis and security improvement | Threat hunting, malware or forensic analysis, advanced incident handling, detection engineering, rule development, and strategic improvements
+
+Roles vary by organization. Some SOCs use different titles or combine tiers. Escalation should follow the organization's procedures and the analyst's authorization.
+
+3. Alert lifecycle
+1) Event generation: a system records an activity.
+2) Collection: an agent, syslog, API, or collector sends the event to the monitoring platform.
+3) Detection: a search or rule identifies a suspicious condition.
+4) Alert creation: the platform creates an alert with evidence and metadata.
+5) Assignment: the alert enters the SOC queue and is assigned.
+6) Initial triage: L1 checks alert validity, severity, affected asset, user, source, and time.
+7) Investigation: the analyst reviews related logs, endpoint data, identity activity, and threat intelligence where appropriate.
+8) Classification: the case is marked true positive, false positive, benign/expected, or inconclusive according to local process.
+9) Escalation/response: confirmed or high-risk cases are escalated; authorized response actions are coordinated.
+10) Closure and lessons learned: document evidence, actions, outcome, and detection improvements.
+
+4. Five questions every triage note must answer
+
+WHO?
+Which user, account, host, process, service, or external source was involved? Include identifiers that help another analyst find the same evidence.
+
+WHAT?
+What exactly happened? Describe the alert, event type, rule, observed behavior, and relevant evidence. Avoid unsupported conclusions.
+
+WHEN?
+When did it happen? Include date, time, time zone, duration, and event sequence. Note whether timestamps are from the endpoint or SIEM if relevant.
+
+WHERE?
+Where did it happen? Include hostname, IP address, application, network segment, cloud resource, or physical/logical location as available.
+
+WHY?
+Why is it considered suspicious or benign? Explain the detection condition, context, evidence, expected behavior, and reason for the classification. If the reason is not yet known, state that the case is inconclusive and list what is missing.
+
+5. Example triage note
+Alert: Possible SSH brute-force activity.
+WHO: Account "testuser"; source address 192.0.2.25; destination host "ubuntu-lab".
+WHAT: Seven SSH authentication failures were recorded. No successful login is confirmed in the reviewed events.
+WHEN: 11 November 2026, 17:00-17:05 IST (example timestamps; replace with actual lab evidence).
+WHERE: Ubuntu lab VM, SSH service.
+WHY: The event count exceeded the configured threshold of five failures in five minutes. The source is not yet verified as authorized. Classification: suspicious / pending investigation, not confirmed compromise.
+Next steps: check source ownership, search for later successful logins, review related activity, preserve relevant logs, and escalate according to procedure.
+
+6. Good triage note practices
+- Use facts and exact timestamps.
+- Separate observed evidence from assumptions.
+- Include the rule name or ID and severity.
+- Record searches performed and relevant results.
+- Explain why an alert was closed or escalated.
+- Do not include passwords, tokens, or other secrets.
+- Follow approved incident response and evidence-handling procedures.
+
+7. L1 escalation checklist
+Escalate when there is credible evidence of account compromise, successful suspicious access, malware execution, privileged account abuse, lateral movement, sensitive data access, or activity affecting a critical asset. Follow local severity and escalation policy; do not delay urgent escalation while trying to prove every detail.
+
+CONCLUSION
+SOC L1 performs initial validation and documentation, L2 conducts deeper investigation and coordinates response, and L3 handles advanced analysis, hunting, and detection improvements. A good triage note clearly answers who, what, when, where, and why.

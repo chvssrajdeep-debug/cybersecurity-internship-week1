@@ -1,0 +1,54 @@
+WEEK 4 - SIEM IN PRACTICE
+01. SIEM BASICS
+
+1. What is a SIEM?
+SIEM stands for Security Information and Event Management. It is a security platform that collects log data from different systems, brings the data together, helps analysts search and investigate events, and generates alerts for suspicious activity. It gives a Security Operations Center (SOC) a central view of an organization's IT environment.
+
+2. Main SIEM components
+- Data sources: endpoints, servers, applications, firewalls, routers, identity systems, and cloud services that generate logs.
+- Log collectors/forwarders: agents or services that collect and send logs to the SIEM.
+- Parsing and normalization: extracts fields such as timestamp, username, source IP, event ID, and action, and makes different log formats easier to analyze.
+- Storage/indexing: stores events so analysts can search current and historical activity.
+- Detection/correlation engine: evaluates events against rules, thresholds, and patterns.
+- Alerting and case management: creates notifications or cases for analysts to investigate.
+- Dashboards and reporting: displays event trends, alerts, and security posture.
+- Search and investigation interface: allows analysts to query events and build timelines.
+
+3. SIEM data flow
+1) A device or application generates an event.
+2) An agent, syslog receiver, API integration, or collector obtains the event.
+3) The event is transported to the SIEM.
+4) The SIEM parses the raw message and extracts fields.
+5) The event is timestamped, normalized, and indexed/stored.
+6) Searches and detection rules examine the data.
+7) A matching rule creates an alert.
+8) A SOC analyst validates the alert, investigates related activity, documents findings, and escalates or closes it.
+
+Simple flow:
+Data sources -> Collection -> Parsing/normalization -> Indexing/storage -> Search/correlation -> Alert -> SOC triage -> Response.
+
+4. SIEM vs log management vs SOAR vs EDR
+
+Technology | Main purpose | Typical functions | Example
+SIEM | Security monitoring and detection across many sources | Central log collection, correlation, searches, alerts, dashboards | Splunk, Microsoft Sentinel, QRadar
+Log management | Collecting, storing, searching, and retaining logs | Log storage, indexing, retention, troubleshooting, audit records | Central syslog server, Graylog
+SOAR | Automating and coordinating security workflows | Playbooks, enrichment, ticket creation, notifications, response actions | Cortex XSOAR, Splunk SOAR
+EDR | Detecting and responding to threats on endpoints | Process monitoring, endpoint telemetry, isolation, threat detection | Microsoft Defender for Endpoint, CrowdStrike Falcon
+
+Key difference:
+- Log management mainly answers: "What happened, and where are the logs?"
+- SIEM adds security-focused analytics and detection: "Is this activity suspicious?"
+- SOAR helps answer: "What workflow should happen next, and can routine steps be automated?"
+- EDR focuses on endpoint behavior and response: "What is happening on this device, and can it be contained?"
+
+These products can overlap. A SIEM may include automation, and an EDR platform may send alerts to a SIEM.
+
+5. Example
+A Linux server records repeated failed SSH logins. The log collector sends the records to the SIEM. A detection rule counts failures by source IP over five minutes. If the threshold is reached, the SIEM creates an alert. An analyst checks whether a successful login followed, whether the source is expected, and whether other hosts were targeted.
+
+6. Benefits and limitations
+Benefits: centralized visibility, faster investigation, correlation across systems, historical searching, and support for incident response.
+Limitations: incomplete logs, poor time synchronization, noisy rules, incorrect parsing, and false positives can reduce effectiveness. A SIEM alert is an investigation lead, not automatic proof of compromise.
+
+CONCLUSION
+A SIEM centralizes security events and applies detection logic to identify suspicious activity. Good log sources, reliable ingestion, correct parsing, and careful analyst triage are all necessary for useful results.

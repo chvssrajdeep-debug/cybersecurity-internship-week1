@@ -1,0 +1,87 @@
+WEEK 4 - SIEM IN PRACTICE
+03. SPL BASICS
+
+1. What is SPL?
+SPL means Search Processing Language. It is used in Splunk to search events, filter records, calculate fields, summarize results, and create time-based reports. SPL commands are commonly connected with the pipe character |. Each command receives the results of the previous command.
+
+Assumption for examples:
+The examples use illustrative field names such as index=security, host, user, src_ip, action, and EventCode. Your actual field names depend on your data source and parsing configuration.
+
+2. search
+Purpose: finds events matching search terms or field conditions.
+Example:
+index=security failed
+This searches the security index for events containing the word "failed".
+Field example:
+index=security action="failure"
+
+3. where
+Purpose: filters results using a Boolean expression, often after fields have been extracted or calculated.
+Example:
+index=security | where count >= 5
+This keeps only results where the field count is at least five.
+Another example:
+index=security | where status="failed"
+
+4. stats
+Purpose: calculates summaries such as count, average, minimum, maximum, and distinct count. It can group results using by.
+Example:
+index=security action="failure" | stats count by src_ip
+This counts failed events for each source IP address.
+Brute-force style summary:
+index=security action="failure" | stats count by user src_ip
+
+5. table
+Purpose: displays selected fields in a clear tabular result.
+Example:
+index=security | table _time host user src_ip action
+This displays only the listed fields.
+Note: table changes the displayed columns; it does not itself prove that the events are malicious.
+
+6. eval
+Purpose: creates or changes a field using an expression.
+Example:
+index=security | eval result=if(action="failure","Failed Login","Other Event") | table _time user src_ip result
+This creates a field named result based on the action field.
+Another example:
+index=security | eval bytes_kb=round(bytes/1024,2)
+
+7. timechart
+Purpose: displays event counts or other statistics over time, useful for identifying spikes and trends.
+Example:
+index=security action="failure" | timechart span=5m count
+This counts matching events in five-minute time buckets.
+Grouped example:
+index=security action="failure" | timechart span=5m count by src_ip
+Use care with high-cardinality fields because a chart with many series can become difficult to read.
+
+8. rex
+Purpose: extracts fields from raw event text using a regular expression.
+Example:
+index=security
+| rex "Failed password for (?:invalid user )?(?<user>\\w+) from (?<src_ip>\\d{1,3}(?:\\.\\d{1,3}){3})"
+| table _time user src_ip
+This example attempts to extract a username and IPv4 address from a common OpenSSH failed-password message. Real log formats vary, so test and adjust the expression against your raw events.
+
+9. Putting commands together
+Example:
+index=security action="failure" earliest=-24h
+| stats count as failures by user src_ip
+| where failures >= 5
+| table user src_ip failures
+This searches the last 24 hours, counts failures by user and source IP, keeps groups with at least five failures, and displays a concise table.
+
+10. Useful SPL concepts
+- _time: event timestamp in Splunk.
+- earliest / latest: limits the time range.
+- by: groups a statistic by one or more fields.
+- count: counts events.
+- as: gives a calculated result a readable field name.
+- span: sets the time bucket size in timechart.
+- Field extraction: turns values in raw text into searchable fields.
+
+11. Important caution
+A search returning five failed logins is not automatically proof of an attack. Check the time window, account, source, successful logins, expected scanners or monitoring systems, and related endpoint activity. Validate the field names and time range before using a search as a production detection.
+
+CONCLUSION
+SPL lets analysts search and summarize security events. Start with search, filter with where, aggregate with stats, display with table, calculate with eval, visualize trends with timechart, and extract raw-text fields with rex.

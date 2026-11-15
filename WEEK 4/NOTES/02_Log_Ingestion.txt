@@ -1,0 +1,55 @@
+WEEK 4 - SIEM IN PRACTICE
+02. LOG INGESTION
+
+1. What is log ingestion?
+Log ingestion is the process of collecting event records from systems and applications and delivering them to a central platform for parsing, storage, searching, and detection.
+
+2. Common log ingestion methods
+
+Method | How it works | Advantages | Limitations / use cases
+Agent | Software installed on an endpoint collects selected logs and forwards them | Rich endpoint visibility, local filtering, reliable collection features | Requires installation, configuration, updates, and resource usage
+Syslog | A device or service sends log messages to a central syslog receiver | Common on Linux and network devices; simple centralized forwarding | Format and reliability vary; UDP can lose messages; secure transport needs configuration
+API | SIEM polls or receives events from a service through its API | Useful for cloud platforms and SaaS applications; structured data | Authentication, rate limits, pagination, and API changes must be handled
+File monitoring | Agent or collector watches a log file and forwards new lines | Useful for application logs and custom files | Rotation, permissions, file paths, and multiline records can cause issues
+
+3. Splunk Universal Forwarder (UF)
+The Splunk Universal Forwarder is a lightweight Splunk agent installed on a machine. It monitors configured files or supported event sources and forwards data to a Splunk receiver/indexer. It is designed primarily to collect and forward data; it does not provide the full Splunk Enterprise search and indexing experience locally.
+
+4. Wazuh agent
+The Wazuh agent is installed on an endpoint and communicates with the Wazuh manager. It collects configured security data such as log events, file integrity monitoring events, inventory information, and security configuration assessment results. The manager analyzes the received data using decoders and rules and generates alerts.
+
+5. Splunk Universal Forwarder vs Wazuh agent
+
+Feature | Splunk Universal Forwarder | Wazuh agent
+Primary role | Forward selected machine data to Splunk | Collect endpoint security telemetry for Wazuh analysis
+Central destination | Splunk receiver/indexer | Wazuh manager
+Typical data | Files, Windows Event Logs, and other configured inputs | Logs, file integrity monitoring, inventory, and security assessment data
+Detection location | Usually searches and detections run in Splunk platform | Wazuh manager analyzes events with decoders and rules
+Configuration | Inputs and outputs, commonly through deployment/config files | Agent configuration and manager-side settings
+Best fit | Organizations using Splunk for broad data analytics | Organizations using Wazuh for endpoint security monitoring
+Important note | UF itself is not the full SIEM | Agent itself is not the manager or dashboard
+
+6. Basic ingestion validation checklist
+- Confirm the source is generating the expected events.
+- Confirm the agent or forwarding service is running.
+- Confirm the configured source path or event channel is correct.
+- Confirm the endpoint can reach the destination.
+- Confirm the receiver/manager is accepting data.
+- Search for the hostname and a recent timestamp.
+- Check that timestamps, time zones, usernames, IP addresses, and event IDs are parsed correctly.
+- Check for gaps, duplicates, or unexpected volume.
+
+7. Common problems and troubleshooting
+Stopped agent: check service status and restart only after understanding why it stopped.
+Wrong destination: verify server address, port, and configuration.
+Firewall/network issue: check approved connectivity between endpoint and collector.
+Wrong file path: verify the file exists and the agent has permission to read it.
+Time mismatch: check endpoint time, time zone, and SIEM parsing.
+Parsing problem: inspect the raw event and confirm the correct parser or decoder is applied.
+Excessive data: filter only approved, useful sources; do not silently discard security-relevant events.
+
+8. Safe lab exercise
+On your own Ubuntu VM, generate a normal authentication event and inspect the relevant authentication log or system journal. If using Windows, inspect Event Viewer. Confirm that the SIEM receives the event and that its timestamp and host identity are correct. Only collect logs from systems you own or are authorized to monitor.
+
+CONCLUSION
+Log ingestion is the foundation of SIEM monitoring. Splunk Universal Forwarder forwards selected machine data to Splunk, while the Wazuh agent sends endpoint security telemetry to the Wazuh manager for analysis.

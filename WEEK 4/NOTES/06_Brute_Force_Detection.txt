@@ -1,0 +1,70 @@
+WEEK 4 - SIEM IN PRACTICE
+06. BRUTE-FORCE DETECTION
+
+1. What is brute force?
+A brute-force attack is an attempt to gain access by repeatedly guessing passwords or other authentication secrets. It may target SSH, Windows logons, web applications, VPNs, or other authentication services.
+
+2. MITRE ATT&CK mapping
+MITRE ATT&CK technique T1110 is Brute Force. It includes multiple sub-techniques, such as password guessing, password cracking, password spraying, and credential stuffing. Select the most specific sub-technique only when the observed behavior supports it.
+
+3. Example detection objective
+Detect five or more failed authentication attempts from the same source IP within five minutes. For a more useful detection, group by source IP, destination host, and account where the log data supports those fields.
+
+4. Detection logic in plain language
+- Collect authentication failure events from SSH or Windows.
+- Keep only events that represent failed logons.
+- Group events by source IP and target account/host.
+- Count the failures in a rolling five-minute window.
+- Generate an alert when the count reaches five or more.
+- Enrich the alert with source, account, destination, timestamps, and event details.
+- Check for a successful login after the failures and related activity.
+- Validate whether the source is authorized before classifying the alert.
+
+This is a defensive monitoring rule for systems you own or are authorized to monitor.
+
+5. Example SPL query for SSH-style logs
+index=security action="failure" service="ssh" earliest=-24h
+| bin _time span=5m
+| stats count as failures by _time src_ip user host
+| where failures >= 5
+| table _time src_ip user host failures
+
+This is a basic fixed-bucket example. A production rolling-window detection may require a different implementation, such as streamstats or a scheduled correlation search, depending on the data volume and Splunk configuration. Confirm the actual field names in your events.
+
+6. Example SPL query for Windows failed logons
+index=windows EventCode=4625 earliest=-24h
+| bin _time span=5m
+| stats count as failures by _time Source_Network_Address TargetUserName Computer
+| where failures >= 5
+| table _time Source_Network_Address TargetUserName Computer failures
+
+Windows field names differ by collection method and parsing. Some environments use IpAddress, src_ip, or other names instead of Source_Network_Address. Validate the fields against a real event before using the search.
+
+7. Wazuh detection concept
+Wazuh can decode SSH or Windows authentication events and apply frequency/correlation rules. A frequency-based rule can count repeated matching events within a time interval and generate an alert when the configured threshold is reached. The exact rule syntax and field names should be checked against the installed Wazuh version and existing rules. Avoid blindly replacing built-in rules.
+
+8. Important investigation evidence
+- Source IP and whether it belongs to a trusted network, VPN, or approved scanner.
+- Target host and account.
+- Number and timing of failures.
+- Whether failures target one account or many accounts.
+- Whether a successful login followed.
+- Whether the account performed unusual actions after login.
+- Whether the same source targeted other systems.
+- Asset importance and business context.
+
+9. False-positive considerations
+A user with a forgotten password, a misconfigured service, an expired stored password, or an authorized security scanner may generate repeated failures. Validate the source and context. Do not automatically allowlist a source just because it is internal.
+
+10. Safe validation in a lab
+Use a test account on your own VM and generate a small, controlled number of failed login events. Confirm that the logs are collected and that the rule counts the events as expected. Do not run password-guessing tests against public or third-party systems.
+
+11. MITRE mapping in an alert
+Tactic: Credential Access.
+Technique: T1110 - Brute Force.
+Sub-technique: choose only if evidence supports it.
+Evidence: repeated authentication failures from the same source against the same or multiple accounts within a defined time window.
+The mapping describes the behavior observed; it does not by itself prove that the attacker gained access.
+
+CONCLUSION
+A brute-force detection uses authentication logs, a time window, grouping fields, and a failure threshold. Analysts must look for context and possible successful access before deciding whether the alert represents a confirmed incident.

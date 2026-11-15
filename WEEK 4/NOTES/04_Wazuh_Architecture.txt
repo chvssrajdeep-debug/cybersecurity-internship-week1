@@ -1,0 +1,77 @@
+WEEK 4 - SIEM IN PRACTICE
+04. WAZUH ARCHITECTURE
+
+1. What is Wazuh?
+Wazuh is an open-source security monitoring platform used for threat detection, security monitoring, log analysis, file integrity monitoring, vulnerability detection, and security configuration assessment.
+
+2. Main architecture components
+
+A. Wazuh agent
+The agent runs on monitored endpoints such as Linux or Windows systems. It collects configured logs and endpoint security data and sends them to the Wazuh manager. It can also perform functions such as file integrity monitoring and security configuration assessment, depending on configuration.
+
+B. Wazuh manager
+The manager receives agent data, decodes and analyzes events, applies rules, and generates alerts. It manages agents and central monitoring configuration.
+
+C. Wazuh indexer
+The indexer stores and indexes alert and event data so that it can be searched efficiently. It is based on the OpenSearch project.
+
+D. Wazuh dashboard
+The dashboard provides a web interface for viewing alerts, querying data, monitoring agents, and exploring security information.
+
+3. Wazuh data flow
+Endpoint event -> Wazuh agent -> Secure communication -> Wazuh manager -> Decoding and rule evaluation -> Alert output -> Wazuh indexer -> Wazuh dashboard.
+
+The exact internal flow can vary by deployment and data type. The manager performs event analysis; the indexer stores searchable data; the dashboard presents it.
+
+4. Decoders
+A decoder identifies the structure and meaning of a raw log message. It extracts useful fields such as source IP, username, program name, and action. For example, a decoder may recognize an SSH authentication message and extract the username and source address.
+
+5. Rules
+Rules evaluate decoded events and decide whether they match a security condition. A rule can match an event type, a field value, a frequency, or a relationship with previous events. When a rule matches, Wazuh can create an alert with a rule ID, description, severity level, and other metadata.
+
+Simple concept:
+Raw log -> Decoder extracts fields -> Rule checks conditions -> Alert is generated if the rule matches.
+
+6. Wazuh rule levels 0-15
+Wazuh rule levels indicate the alert's severity/importance. They are not a direct probability that an attack succeeded.
+
+Level | General meaning
+0 | Ignored; no alert is generated for the event.
+1 | Very low importance; usually informational and not normally shown as a security alert.
+2 | Low importance; basic system notification.
+3 | Successful/authorized activity or other low-priority event, depending on the rule.
+4 | System error or relevant low-level issue.
+5 | User-generated error or potentially relevant event.
+6 | Low-relevance security event.
+7 | Relevant security event that may deserve attention.
+8 | First-time or unusual activity that may be suspicious.
+9 | Error from an invalid source or a more important security event.
+10 | Multiple user errors or a more significant suspicious condition.
+11 | High-importance warning or security event.
+12 | High-importance security event that may indicate an attack.
+13 | Severe security event.
+14 | High-severity event, often indicating a significant attack pattern.
+15 | Highest severity; critical event.
+
+Important: Exact descriptions and operational meaning depend on the installed Wazuh version and the specific rule. Read the rule description and conditions rather than relying only on the level number. A high level is not proof that an incident succeeded.
+
+7. Example of rule logic
+A rule may identify an SSH authentication failure. Another frequency-based rule may identify repeated failures from the same source. The second rule can raise a higher-level alert when a threshold is met. Analysts should verify whether the activity is expected and whether a successful login followed.
+
+8. Where to investigate in Wazuh
+- Check whether the agent is active and reporting.
+- Open the alert details and inspect rule ID, level, description, timestamp, and agent.
+- Review the full log message and extracted fields.
+- Search related events for the same user, source IP, and host.
+- Check whether the alert repeats across multiple endpoints.
+- Record evidence and disposition.
+
+9. Common architecture issues
+Agent disconnected: verify agent service, enrollment, network path, and manager availability.
+No alerts: confirm the source log is collected, the decoder matches, and a rule applies.
+Missing dashboard data: check manager alert output, indexer health, and data ingestion.
+Incorrect fields: inspect the raw event and decoder behavior.
+Excessive alerts: review rule scope and tune carefully without hiding meaningful activity.
+
+CONCLUSION
+The Wazuh agent collects endpoint data, the manager analyzes it using decoders and rules, the indexer stores searchable results, and the dashboard displays them for analysts.

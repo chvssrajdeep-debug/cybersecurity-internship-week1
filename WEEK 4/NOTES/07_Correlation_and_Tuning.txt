@@ -1,0 +1,73 @@
+WEEK 4 - SIEM IN PRACTICE
+07. CORRELATION AND TUNING
+
+1. What is event correlation?
+Event correlation is the process of connecting multiple events to identify a meaningful pattern. A single event may be harmless, but a sequence of related events can indicate suspicious behavior.
+
+Example:
+Several failed logins -> a successful login from the same source -> unusual privileged activity.
+When these events share a user, host, source, and timeline, they may form a stronger detection than any one event alone.
+
+2. Correlation rules
+A correlation rule combines conditions across events or data sources.
+Example:
+If five failed logins for the same account occur from one source IP within five minutes, create an alert. Increase priority if a successful login follows shortly afterward.
+Use correlation when the relationship between events is important, not just the presence of one event.
+
+3. Thresholds
+A threshold is a numeric limit that triggers an action when a count or value reaches it.
+Example:
+Alert when failed_logins >= 5 in five minutes.
+Use thresholds for repeated or unusually frequent activity. Set the value using observed behavior, risk, and testing; there is no universal threshold that fits every organization.
+
+4. Baselines
+A baseline describes normal activity for a system, user, network, or time period.
+Example:
+A server normally receives a small number of SSH login failures per day. A sudden increase at an unusual time may be suspicious.
+Use baselines to identify deviations from normal behavior. Account for shifts, maintenance windows, seasonality, and changes in business activity.
+
+5. Allowlists
+An allowlist is a narrowly defined set of known, approved entities or activities that should be treated differently by a detection.
+Example:
+A verified vulnerability scanner may be allowlisted for a specific scan schedule and target range.
+Use allowlists only when ownership, purpose, scope, and expiry/review are documented. An allowlist should not broadly exclude an entire internal network or all activity from a trusted-looking address.
+
+6. Comparison
+
+Method | What it does | Best used when | Main risk
+Correlation rule | Connects related events or conditions | A sequence or relationship indicates risk | Incorrect joins or time windows can create noise or miss events
+Threshold | Triggers after a count/value reaches a limit | Repeated activity or volume matters | Too high misses slow activity; too low creates false positives
+Baseline | Compares current activity with normal behavior | Behavior varies by user, host, or time | Poor or outdated baseline creates bad decisions
+Allowlist | Excludes or treats approved activity differently | A known source or activity is verified and scoped | Overbroad or stale exclusions hide attacks
+
+7. How to tune a detection
+1) Review a sample of alerts and the raw events.
+2) Identify common false-positive causes.
+3) Confirm the data fields and timestamps are correct.
+4) Check whether the threshold and time window fit normal activity.
+5) Add context such as asset, account, source, and business schedule.
+6) Make the smallest safe change.
+7) Test the detection against known benign and suspicious examples.
+8) Document the reason, owner, scope, and review date.
+9) Monitor false positives and false negatives after the change.
+
+8. Example: tuning a brute-force alert
+Initial logic: five failed logins in five minutes.
+Observed issue: a known scanner creates repeated failures during an approved test.
+Safe tuning:
+- Verify the scanner owner and approved source address.
+- Restrict the exception to the scanner's exact source, target systems, and approved time window.
+- Keep monitoring other sources and unexpected activity.
+- Set a review/expiry date for the exception.
+- Continue alerting if a successful login or unusual follow-on activity occurs, where supported.
+
+9. Important principles
+- Do not tune only to reduce alert count.
+- Preserve visibility for high-risk assets and privileged accounts.
+- Prefer narrow, documented exceptions.
+- Re-test after rule or parser changes.
+- Keep an audit trail of detection changes.
+- Revisit baselines as the environment changes.
+
+CONCLUSION
+Correlation connects events, thresholds detect repeated activity, baselines identify deviations, and allowlists handle verified approved activity. Effective tuning reduces noise while protecting detection coverage.

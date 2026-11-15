@@ -1,0 +1,79 @@
+WEEK 4 - SIEM IN PRACTICE
+05. ALERT ANALYSIS
+
+1. What is alert analysis?
+Alert analysis is the process of reviewing a security alert, checking the supporting evidence, deciding whether the activity is benign or suspicious, and determining the next action.
+
+2. True positive (TP)
+A true positive occurs when the detection correctly identifies genuinely malicious or policy-violating activity.
+Example: A rule detects repeated SSH password failures from an unknown external IP, and investigation confirms unauthorized password guessing.
+Action: preserve evidence, scope the activity, and escalate or respond according to procedure.
+
+3. False positive (FP)
+A false positive occurs when legitimate activity is incorrectly identified as suspicious.
+Example: An approved vulnerability scanner performs many login checks and triggers a brute-force rule.
+Action: verify the scanner owner, schedule, source, and authorization. Tune the rule narrowly if the activity is consistently approved.
+
+4. True negative (TN)
+A true negative occurs when normal activity is correctly not alerted on.
+Example: An employee logs in normally from an expected device and no suspicious behavior is detected.
+Note: In day-to-day SOC work, analysts do not manually review every true negative. They are often measured through detection testing and coverage validation.
+
+5. False negative (FN)
+A false negative occurs when malicious activity happens but the detection does not alert.
+Example: An attacker makes slow password guesses below the configured threshold, so the brute-force rule does not trigger.
+Action: improve detection coverage, review thresholds and telemetry, and test for gaps.
+
+6. Confusion matrix
+
+Actual condition | Alert generated | No alert
+Malicious activity | True positive | False negative
+Benign activity | False positive | True negative
+
+7. Alert fatigue
+Alert fatigue occurs when analysts receive too many alerts, especially repetitive or low-value alerts. Important alerts may be delayed or overlooked because the queue is noisy.
+
+Example: A poorly configured rule creates hundreds of alerts for routine authentication failures from a known internal monitoring system.
+
+Ways to reduce alert fatigue:
+- Remove duplicate or redundant detections.
+- Add context such as asset criticality and user role.
+- Tune thresholds based on observed normal behavior.
+- Use narrow allowlists for verified approved sources.
+- Group repeated related events into one case where supported.
+- Review false-positive trends regularly.
+- Do not suppress alerts solely to make the dashboard look quieter.
+
+8. Detection tuning
+Tuning means adjusting detection logic to improve accuracy while preserving the ability to detect real threats.
+
+Example:
+Initial rule: alert on five failed logins from any source in five minutes.
+Problem: a shared NAT address or approved scanner may create frequent failures.
+Possible tuning: group by source IP and username, exclude only a verified authorized scanner within its approved scope, and alert more strongly if a successful login follows.
+
+9. Basic alert investigation checklist
+- What rule generated the alert?
+- What happened in the raw event?
+- Which host and account were involved?
+- What are the source and destination addresses?
+- When did it happen, and what is the time zone?
+- Is the source expected or authorized?
+- Did a successful login or other suspicious event follow?
+- Are other users or hosts affected?
+- Is the asset critical?
+- What evidence supports the final classification?
+
+10. Example investigation
+Alert: repeated failed SSH logins.
+Analyst checks:
+1) Confirm that the events are genuine SSH authentication failures.
+2) Group them by source IP, username, host, and time window.
+3) Check whether the source is an approved scanner, VPN, or known administrator address.
+4) Look for a successful login after the failures.
+5) Check other activity from the same source and account.
+6) Record evidence and classify as true positive, false positive, or inconclusive.
+7) Escalate according to the organization's incident response process if compromise is suspected.
+
+CONCLUSION
+Alert analysis requires evidence and context. True/false positive and negative classifications describe whether a detection was correct. Tuning should reduce noise without creating blind spots.
